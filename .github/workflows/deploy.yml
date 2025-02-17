@@ -26,7 +26,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       
       - name: Grant Execute permission ro script
-        run: chmod +x terraform.sh
+        run: chmod 766 terraform.sh
 
       - name: Grant Execute permission ro script
         run: ./terraform.sh
