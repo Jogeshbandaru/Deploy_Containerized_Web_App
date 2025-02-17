@@ -8,9 +8,6 @@ WORKDIR /app
 COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application files
-COPY . .
-
 # Expose application port
 EXPOSE 80
 
