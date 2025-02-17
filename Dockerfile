@@ -1,18 +1,18 @@
 # Use an official Node.js runtime as a parent image (modify based on your application)
-FROM node:18-alpine
+FROM python:3.9-slim
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and install dependencies
-COPY package.json package-lock.json ./
-RUN npm install
+# Copy application files and install dependencies
+COPY . /app
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
 COPY . .
 
 # Expose application port
-EXPOSE 3000
+EXPOSE 80
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:80", "app:app"]
