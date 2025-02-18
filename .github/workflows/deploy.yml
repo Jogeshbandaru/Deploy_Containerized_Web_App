@@ -28,7 +28,7 @@ jobs:
       - name: Grant Execute permission ro script
         run: chmod 766 terraform.sh
 
-      - name: Grant Execute permission ro script
+      - name: Create ECS Fargate Infrastructure using terraform
         run: ./terraform.sh
 
       - name: Login to Amazon ECR
