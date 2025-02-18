@@ -15,7 +15,7 @@ resource "aws_ecs_cluster" "my_cluster" {
 # 3. Create a Security Group
 resource "aws_security_group" "ecs_sg" {
   name_prefix = "ecs-sg"
-  vpc_id      = "vpc-0c15a56a810a053f1"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port   = 80
@@ -31,14 +31,14 @@ resource "aws_lb" "ecs_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs_sg.id]
-  subnets           = ["subnet-0bf967e58e2420652", "subnet-07ed6b6cf9bc06be8"]
+  subnets           = [aws_subnet.public_subnet.id, aws_subnet.private_subnet.id]
 }
 
 resource "aws_lb_target_group" "ecs_tg" {
   name     = "ecs-target-group"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = "vpc-0c15a56a810a053f1"
+  vpc_id   = aws_vpc.main.id
 }
 
 resource "aws_lb_listener" "ecs_listener" {
@@ -86,7 +86,7 @@ resource "aws_ecs_service" "web_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = ["subnet-0bf967e58e2420652", "subnet-07ed6b6cf9bc06be8"]
+    subnets         = [aws_subnet.public_subnet.id, aws_subnet.private_subnet.id]
     security_groups = [aws_security_group.ecs_sg.id]
   }
 
