@@ -1,17 +1,3 @@
-terraform {
-  backend "s3" {
-    bucket         = "terraform_state_file"  # Replace with your bucket name
-    key            = "terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "terraform-lock-table"  # For state locking
-  }
-}
-
-provider "aws" {
-  region = "us-east-1"
-}
-
 # 1. Create ECR Repository
 resource "aws_ecr_repository" "my_app_repo" {
   name = "web-app"
@@ -49,7 +35,7 @@ resource "aws_lb" "ecs_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs_sg.id]
-  subnets           = [aws_subnet.public_subnet.id, aws_subnet.private_subnet.id]
+  subnets           = [aws_subnet.public_subnet.id]
 }
 
 resource "aws_lb_target_group" "ecs_tg" {
@@ -59,16 +45,16 @@ resource "aws_lb_target_group" "ecs_tg" {
   vpc_id   = aws_vpc.main.id
 }
 
-resource "aws_lb_listener" "ecs_listener" {
-  load_balancer_arn = aws_lb.ecs_lb.arn
-  port              = 80
-  protocol          = "HTTP"
+# resource "aws_lb_listener" "ecs_listener" {
+#   load_balancer_arn = aws_lb.ecs_lb.arn
+#   port              = 80
+#   protocol          = "HTTP"
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ecs_tg.arn
-  }
-}
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.ecs_tg.arn
+#   }
+# }
 
 # IAM Role for ECS Execution
 resource "aws_iam_role" "ecs_execution_role" {
@@ -102,7 +88,7 @@ resource "aws_ecs_task_definition" "web_task" {
 
   container_definitions = jsonencode([
     {
-      name      = "web-app-container"
+      name      = "web-app"
       image     = aws_ecr_repository.my_app_repo.repository_url
       cpu       = 256
       memory    = 512
@@ -126,7 +112,7 @@ resource "aws_ecs_service" "web_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = [aws_subnet.public_subnet.id, aws_subnet.private_subnet.id]
+    subnets         = [aws_subnet.public_subnet.id]
     security_groups = [aws_security_group.ecs_sg.id]
   }
 
