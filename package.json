@@ -1,5 +1,5 @@
 {
-    "name": "my-web-app",
+    "name": "web-app",
     "version": "1.0.0",
     "description": "A simple web application deployed to AWS ECS Fargate",
     "main": "server.js",

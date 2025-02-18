@@ -4,17 +4,17 @@ provider "aws" {
 
 # 1. Create ECR Repository
 resource "aws_ecr_repository" "my_app_repo" {
-  name = "my-web-app"
+  name = "web-app"
 }
 
 # 2. Create ECS Cluster
 resource "aws_ecs_cluster" "my_cluster" {
-  name = "web-app-cluster"
+  name = "web-app"
 }
 
 # 3. Create a Security Group
 resource "aws_security_group" "ecs_sg" {
-  name_prefix = "ecs-sg"
+  name_prefix = "ecs-sg-WebApp"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -23,7 +23,15 @@ resource "aws_security_group" "ecs_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
+
 
 # 4. Create a Load Balancer
 resource "aws_lb" "ecs_lb" {
