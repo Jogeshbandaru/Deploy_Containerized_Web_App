@@ -27,4 +27,3 @@ resource "aws_dynamodb_table" "terraform_lock" {
 resource "random_id" "dynamodb_suffix" {
   byte_length = 4
 }
-
