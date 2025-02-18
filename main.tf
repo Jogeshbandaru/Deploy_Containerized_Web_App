@@ -1,7 +1,13 @@
 # 1. Create ECR Repository
-resource "aws_ecr_repository" "my_app_repo" {
-  name = "web-app"
+resource "aws_ecr_repository" "web_app" {
+  name                 = "web-app"
+  image_tag_mutability = "MUTABLE"
+
+  lifecycle {
+    prevent_destroy = false
+  }
 }
+
 
 # 2. Create ECS Cluster
 resource "aws_ecs_cluster" "my_cluster" {
@@ -113,6 +119,6 @@ resource "aws_ecs_service" "web_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_tg.arn
     container_name   = "web-app-container"
-    container_port   = 3000
+    container_port   = 80
   }
 }
