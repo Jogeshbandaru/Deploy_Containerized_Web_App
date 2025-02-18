@@ -35,7 +35,7 @@ resource "aws_lb" "ecs_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs_sg.id]
-  subnets           = [aws_subnet.public_subnet.id]
+  subnets           = [aws_subnet.public_subnet.id, aws_subnet.private_subnet.id]
 }
 
 resource "aws_lb_target_group" "ecs_tg" {
@@ -112,7 +112,7 @@ resource "aws_ecs_service" "web_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = [aws_subnet.public_subnet.id]
+    subnets         = [aws_subnet.public_subnet.id, aws_subnet.private_subnet.id]
     security_groups = [aws_security_group.ecs_sg.id]
   }
 
