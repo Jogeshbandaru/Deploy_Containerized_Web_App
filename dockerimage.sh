@@ -1,2 +1,2 @@
-docker build -t my-web-app .
-docker run -p 3000:3000 my-web-app
+docker build -t web-app .
+docker run -p 3000:3000 web-app
