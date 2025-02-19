@@ -36,11 +36,11 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
 
-      - name: Build, Tag, and Push Docker Image
-        run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
-          docker push ${{ secrets.ECR_REPOSITORY }}:latest
+      # - name: Build, Tag, and Push Docker Image
+      #   run: |
+      #     docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
+      #     docker push ${{ secrets.ECR_REPOSITORY }}:latest
 
       - name: Deploy to ECS
         run: |
-          aws ecs update-service --cluster web-app-cluster --service web-app-service --force-new-deployment
+          aws ecs update-service --cluster web-app --service web-app-service --force-new-deployment
