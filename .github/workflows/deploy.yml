@@ -25,21 +25,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       
-      # - name: Grant Execute permission ro script
-      #   run: chmod 766 terraform.sh
+      - name: Grant Execute permission ro script
+        run: chmod 766 terraform.sh
 
-      # - name: Create ECS Fargate Infrastructure using terraform
-      #   run: ./terraform.sh
+      - name: Create ECS Fargate Infrastructure using terraform
+        run: ./terraform.sh
 
       - name: Login to Amazon ECR
         id: login-ecr
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
 
-      # - name: Build, Tag, and Push Docker Image
-      #   run: |
-      #     docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
-      #     docker push ${{ secrets.ECR_REPOSITORY }}:latest
+      - name: Build, Tag, and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
+          docker push ${{ secrets.ECR_REPOSITORY }}:latest
 
       - name: Deploy to ECS
         run: |
