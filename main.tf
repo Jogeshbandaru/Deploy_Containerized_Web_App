@@ -37,7 +37,7 @@ resource "aws_security_group" "ecs_sg" {
 
 # 4. Create a Load Balancer
 resource "aws_lb" "ecs_lb" {
-  name               = "ecs-load-balancer"
+  name               = "ecs-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs_sg.id]
@@ -49,19 +49,47 @@ resource "aws_lb_target_group" "ecs_tg" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
-  target_type = "ip"  # Change from "instance" to "ip"
+  target_type = "ip"
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
-# resource "aws_lb_listener" "ecs_listener" {
-#   load_balancer_arn = aws_lb.ecs_lb.arn
-#   port              = 80
-#   protocol          = "HTTP"
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.ecs_lb.arn
+  port              = 80
+  protocol          = "HTTP"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.ecs_tg.arn
-#   }
-# }
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Service Unavailable"
+      status_code  = "503"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "ecs_rule" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ecs_tg.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
+}
 
 # IAM Role for ECS Execution
 resource "aws_iam_role" "ecs_execution_role" {
